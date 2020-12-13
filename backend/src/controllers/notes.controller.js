@@ -8,7 +8,7 @@ notesCtrl.getNotes = async (req, res) => {
 };
 
 //Crear una nueva nota
-notesCtrl.createNote = (req, res) => {
+notesCtrl.createNote = async (req, res) => {
   const { title, content, date, author } = req.body;
   const newNote = new Note({
     title,
@@ -16,13 +16,34 @@ notesCtrl.createNote = (req, res) => {
     date,
     author,
   });
-  console.log(newNote);
-
-  res.status(201).json({ message: "Note Saved" });
+  await newNote.save();
+  await res.status(201).json({ message: "Note Saved" });
 };
 
-notesCtrl.getNote = (req, res) => res.json({ title: "epepemdjsds" });
-notesCtrl.updateNote = (req, res) => res.json({ message: "Note Updated" });
-notesCtrl.deleteNote = (req, res) => res.json({ message: "Note deleted" });
+//Obtener una única nota a través del ID
+notesCtrl.getNote = async (req, res) => {
+  const note = await Note.findById(req.params.id);
+  //console.log(req.params.id);
+  res.json(note);
+};
+
+//Actualizar una nota en la BD a través de un ID
+//Eliminar una nota de la BD a través de un ID
+//Para poder actualizar una nota necesitos dos cosas
+//1. el id de la nota y en segundo lugar los datos a actualizar
+notesCtrl.updateNote = async (req, res) => {
+  const { title, content, author } = req.body;
+  await Note.findByIdAndUpdate(req.params.id, {
+    title,
+    author,
+    content,
+  });
+  res.json({ message: "Note Updated" });
+};
+
+notesCtrl.deleteNote = async (req, res) => {
+  await Note.findByIdAndDelete(req.params.id);
+  res.json({ message: "Note Deleted" });
+};
 
 module.exports = notesCtrl;
