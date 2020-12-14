@@ -7,15 +7,32 @@ export default class CreateUser extends Component {
     username: "",
   };
   async componentDidMount() {
-    const res = await axios.get("http://localhost:5000/api/users");
-    this.setState({ users: res.data });
+    this.getUsers();
   }
 
+  getUsers = async () => {
+    const res = await axios.get("http://localhost:5000/api/users");
+    this.setState({ users: res.data });
+  };
   onChangeUsername = (e) => {
     this.setState({
       username: e.target.value,
     });
-    console.log(e.target.value);
+    //console.log(e.target.value);
+  };
+
+  onSubmit = async (e) => {
+    e.preventDefault();
+    await axios.post("http://localhost:5000/api/users", {
+      username: this.state.username,
+    });
+    this.setState({ username: "" });
+
+    this.getUsers();
+  };
+  deleteUser = async (id) => {
+    await axios.delete("http://localhost:5000/api/users/" + id);
+    this.getUsers();
   };
 
   render() {
@@ -24,14 +41,18 @@ export default class CreateUser extends Component {
         <div className="col md-4">
           <div className="card card-body">
             <h3>Create New User</h3>
-            <form action="">
+            <form onSubmit={this.onSubmit}>
               <div className="form-group">
                 <input
                   type="text"
                   className="form-control"
+                  value={this.state.username}
                   onChange={this.onChangeUsername}
                 />
               </div>
+              <button type="submit" className="btn btn-primary">
+                Save
+              </button>
             </form>
           </div>
         </div>
@@ -41,6 +62,7 @@ export default class CreateUser extends Component {
               <li
                 className="list-group-item list-group-item-action"
                 key={user._id}
+                onDoubleClick={() => this.deleteUser(user._id)}
               >
                 {user.username}
               </li>
