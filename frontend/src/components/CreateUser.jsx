@@ -51,7 +51,7 @@ export default class CreateUser extends Component {
                 />
               </div>
               <button type="submit" className="btn btn-primary">
-                Save
+                Save <i class="fas fa-save"></i>
               </button>
             </form>
           </div>
